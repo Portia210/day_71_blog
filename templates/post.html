@@ -1,0 +1,107 @@
+{% include "header.html" %}
+
+<!-- Page Header-->
+<header class="masthead" style="background-image: url('{{post.img_url}}')">
+  <div class="container position-relative px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        <div class="post-heading">
+          <h1>{{ post.title }}</h1>
+          <h2 class="subheading">{{ post.subtitle }}</h2>
+          <span class="meta">Posted by
+            <a href="#">{{ post.author }}</a>
+            on {{ post.date }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- FLASH MESSAGES -->
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div class="container mt-3">
+  <div class="row justify-content-center">
+    <div class="col-md-10 col-lg-8 col-xl-7">
+      {% for message in messages %}
+      <div class="alert alert-info alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endwith %}
+
+<!-- Post Content -->
+<article>
+  <div class="container px-4 px-lg-5">
+    <div class="row gx-4 gx-lg-5 justify-content-center">
+      <div class="col-md-10 col-lg-8 col-xl-7">
+        {{ post.body|safe }}
+        <!--TODO: Only show Edit Post button if user id is 1 (admin user) -->
+        <div class="d-flex justify-content-end mb-4">
+          <a class="btn btn-primary float-right" href="{{url_for('edit_post', post_id=post.id)}}">Edit Post</a>
+        </div>
+
+        <!-- Comments Area -->
+        <div class="comment-section mt-5">
+          <h3 class="mb-4">Comments</h3>
+          
+          {% if current_user.is_authenticated %}
+          <div class="card mb-4">
+            <div class="card-body">
+              <h5 class="card-title">Add a Comment</h5>
+              <form action="{{ url_for('show_post', post_id=post.id) }}" method="post">
+                {{ form.csrf_token }}
+                <div class="mb-3">
+                  {{ form.comment(class="form-control", rows="4") }}
+                </div>
+                <div class="d-flex justify-content-end">
+                  {{ form.submit(class="btn btn-primary") }}
+                </div>
+              </form>
+            </div>
+          </div>
+          {% else %}
+          <div class="alert alert-info">
+            <p class="mb-0">Please <a href="{{ url_for('login') }}" class="alert-link">login</a> to leave a comment.</p>
+          </div>
+          {% endif %}
+
+          <!-- Show all the comments on a post -->
+          <div class="comments-list">
+            {% if post.comments %}
+              {% for comment in post.comments %}
+              <div class="comment-item card mb-3">
+                <div class="card-body">
+                  <div class="d-flex">
+                    <div class="commenter-image me-3">
+                      <img src="../static/assets/img/default-profile.jpg" class="rounded-circle" width="50" height="50" alt="Profile" />
+                    </div>
+                    <div class="comment-content flex-grow-1">
+                      <div class="comment-text mb-2">
+                        {{ comment.text|safe }}
+                      </div>
+                      <div class="comment-meta text-muted small">
+                        <span class="comment-author">{{ comment.author.name }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <p class="text-muted">No comments yet. Be the first to comment!</p>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</article>
+
+{% include "footer.html" %}
