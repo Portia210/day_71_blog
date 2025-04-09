@@ -10,3 +10,5 @@ flask_sqlalchemy==3.1.1
 SQLAlchemy==2.0.40
 gunicorn==23.0.0
 psycopg2-binary==2.9.10
+bleach==6.2.0
+email_validator==2.2.0
